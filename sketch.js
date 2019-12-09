@@ -184,6 +184,7 @@ function setup() {
     questionDiv = createDiv();
     rulesDiv = createDiv();
     feedbackDiv = createDiv('You have not answered yet!');
+<<<<<<< HEAD
     feedbackDiv.position(170,670);
     feedbackDiv.style('font-size', '200%');
 
@@ -198,6 +199,14 @@ function setup() {
     quittext.style('position','absolute');
     quittext.style('top','35%');
     quittext.style('left','5%');
+=======
+    feedbackDiv.position(650,650);
+    feedbackDiv.style('font-size', '200%');
+
+    winorlose = createDiv();
+    winorlose.position(700,700);
+    winorlose.style('font-weight', 'bold');
+>>>>>>> 76b2f878f2a4e3b2dcf737a1aa5105e3f9f344fd
 
     rulesDiv.position(800,0);
     rulesDiv.size(450, AUTO);
@@ -551,6 +560,7 @@ function checkE(){
         feedbackDiv.html("You are incorrect! Sorry!");
         feedbackDiv.style("color", "red");
     }
+<<<<<<< HEAD
 
 }
 
@@ -608,4 +618,6 @@ function quit()
   feedbackDiv.style("color", "black");
   minutes = 9;
   seconds = 0;
+=======
+>>>>>>> 76b2f878f2a4e3b2dcf737a1aa5105e3f9f344fd
 }
