@@ -62,6 +62,7 @@ let correctOption3;
 let correctOption4;
 let correctOption5;
 
+
 let headcirc;
 let bodyline;
 let arm1;
@@ -71,7 +72,11 @@ let leg2;
 
 let wrongCount;
 
+let menu = true;
+let help1 = false;
+let win = false;
 
+let speechRec;
 function preload(){
     //SAOFont=loadFont('assets/SAOWelcomeAnotherTT-Bold.ttf');
 }
@@ -79,6 +84,9 @@ function preload(){
 function setup() {
     createCanvas(1280, 640);
     background(255);
+
+    speechRec = new p5.SpeechRec("en-US", gotSpeech);
+    speechRec.start();
     optionAbtn = createButton('Pick A');
     optionAbtn.position(730, 410);
     optionAbtn.mousePressed(checkA);
@@ -94,13 +102,23 @@ function setup() {
     optionEbtn = createButton('Pick E');
     optionEbtn.position(730, 570);
     optionEbtn.mousePressed(checkE);
-    //hanger
-    fill(0);
-    strokeWeight(4);
-    line(300,100,300,800);
-    line(300,100,450,100);
-    line(450,100,450,200);
 
+    hideAButton = createButton('Hide');
+    hideAButton.position(680, 410);
+    hideAButton.mousePressed(hideA);
+    hideBButton = createButton('Hide');
+    hideBButton.position(680, 450);
+    hideBButton.mousePressed(hideB);
+    hideCButton = createButton('Hide');
+    hideCButton.position(680, 490);
+    hideCButton.mousePressed(hideC);
+    hideDButton = createButton('Hide');
+    hideDButton.position(680, 530);
+    hideDButton.mousePressed(hideD);
+    hideEButton = createButton('Hide');
+    hideEButton.position(680, 570);
+    hideEButton.mousePressed(hideE);
+    
     //hangman
     //bodyline = line(450, 300, 450, 500);
     //arm1 = line(450, 350, 550, 450);
@@ -111,7 +129,7 @@ function setup() {
     wrongCount = 0;
 
 
-    rulesText="A movie sutdio is scheduling the release of six films -- Fiesta, Glaciers, Hurricanes, Jets, Kangaroos, and Lovebird. No two of these films can be released on the same date. The release schedule is governed by the following conditions:";
+    rulesText="A movie studio is scheduling the release of six films -- Fiesta, Glaciers, Hurricanes, Jets, Kangaroos, and Lovebird. No two of these films can be released on the same date. The release schedule is governed by the following conditions:";
     cond1="Fiesta must be released earlier than both Jets and Lovebird.";
     cond2="Kangaroos must be released earlier than Jets, and Jets must be released earlier than Hurricanes.";
     cond3= "Lovebird must be released earlier than Glaciers";
@@ -135,7 +153,7 @@ function setup() {
     correctOption2 = 'A';
 
     //Question 3 Setup
-    questionText3= "If Glaciers is released earlier than Hurricanes, then each of the followibg could be true EXCEPT:";
+    questionText3= "If Glaciers is released earlier than Hurricanes, then each of the following could be true EXCEPT:";
     optionAText3="A. Glaciers is released fourth.";
     optionBText3="B. Jets is released third.";
     optionCText3="C. Kangaroos is released second.";
@@ -143,14 +161,43 @@ function setup() {
     optionEText3="E. Lovebird is released fifth.";
     correctOption3 = 'E';
 
+    //Question 4 Setup
+    questionText4= "If Lovebird is released earlier than Kangaroos, which one of the following could be true?";
+    optionAText4="A. Lovebird is released third.";
+    optionBText4="B. Lovebird is released fourth.";
+    optionCText4="C. Hurricanes is released earlier than Lovebird.";
+    optionDText4="D. Jets is released earlier than Glaciers.";
+    optionEText4="E. Jets is released earlier than Lovebird.";
+    correctOption4 = 'D';
+
+
+    //Question 5 Setup
+    questionText5= "Which one of the following, if substituted for the condition that Fiesta must be released earlier than both Jets and Lovebird, would have the same effect on the order in which the films are released?";
+    optionAText5="A. Only Kangaroos can be released earlier than Fiesta.";
+    optionBText5="B. Kangaroos must be released earlier than Lovebird.";
+    optionCText5="C. Fiesta must be released either first or second.";
+    optionDText5="D. Fiesta must be released earlier than both Kangaroos and Lovebird.";
+    optionEText5="E. Either Fiesta or Kangaroos must be released first.";
+    correctOption5 = 'A';
+
     //formatting
     questionDiv = createDiv();
     rulesDiv = createDiv();
     feedbackDiv = createDiv('You have not answered yet!');
-    feedbackDiv.position(700,650);
+    feedbackDiv.position(170,670);
+    feedbackDiv.style('font-size', '200%');
 
-    winorlose = createDiv();
-    winorlose.position(700,700);
+    quitprompt = createDiv();
+    quitprompt.size(700,360);
+    quitprompt.style('background-color', 'red');
+    quitprompt.style('text-align','center');
+    quitprompt.style('border-radius','25px');
+    quitprompt.position(600,300);
+    quittext = createElement('h1').parent(quitprompt);
+    //quittext.style('margin','0');
+    quittext.style('position','absolute');
+    quittext.style('top','35%');
+    quittext.style('left','5%');
 
     rulesDiv.position(800,0);
     rulesDiv.size(450, AUTO);
@@ -179,76 +226,223 @@ function setup() {
     optionCpar.style('text-indent', '20px');
     optionDpar.style('text-indent', '20px');
     optionEpar.style('text-indent', '20px');
+  
+  
+    playbutton = createButton("Play");
+    playbutton.position(750,225)
+    playbutton.mousePressed(play);
+    playbutton.style("font-size", "32px");
+    
+  
+    titleDiv = createDiv("LSAT Hangman");
+    titleDiv.position(450,50);
+    titleDiv.style("font-size", "110px");
+    titleDiv.style('font-style', 'bold');
+  
+    helpbutton = createButton("Help");
+    helpbutton.position(750,290)
+    helpbutton.mousePressed(play);
+    helpbutton.style("font-size", "32px");
+    helpbutton.mousePressed(help);
+  
+    optionsbutton = createButton("Options");
+    optionsbutton.position(727,355)
+    optionsbutton.mousePressed(play);
+    optionsbutton.style("font-size", "32px");
+    optionsbutton.mousePressed(options);
+  
+    helpDiv = createDiv("Rules of the game: You will be given sample logic questions from the LSAT(Law School Admission Test). If you guess wrong, a new piece of the hangman will be drawn. If you guess correctly, you will move on to the next question. The game ends when all pieces of the hangman are drawn.");
+    helpDiv.position(400,200);
+    helpDiv.size(850, AUTO);
+    helpDiv.style("font-size","32px");
+    helpDiv.hide();
+    endhelpbutton = createButton("X");
+    endhelpbutton.position(900,200);
+    endhelpbutton.hide();
+    endhelpbutton.mousePressed(endhelp);
+  
+    quitbutton = createButton("X");
+    quitbutton.position(1200,25);
+    quitbutton.hide();
+    quitbutton.mousePressed(quit);
+  
+    seconds = 0;
+    minutes = 9;
+  
+  
+    
 
 }
 
 function draw() {
 
+    if(menu == true)
+    {
+      background(255,255,255); 
+      optionAbtn.hide();
+      optionBbtn.hide();
+      optionCbtn.hide();
+      optionDbtn.hide();
+      optionEbtn.hide();
+      feedbackDiv.hide();
+      rulesDiv.hide();
+      questionDiv.hide();
+      hideAButton.hide();
+      hideBButton.hide();
+      hideCButton.hide();
+      hideDButton.hide();
+      hideEButton.hide();
+      quitprompt.hide();
+      titleDiv.show();
+      playbutton.show();
+      helpbutton.show();
+      optionsbutton.show();
+      helpDiv.hide();
+      endhelpbutton.hide();
+      if(help1 == true)
+      {
+        helpDiv.show();
+        playbutton.hide();
+        helpbutton.hide();
+        optionsbutton.hide();
+        endhelpbutton.show();
+      }
+      
+      
+      
+    }
+    else
+    {
+      rect(90,70,80,40);
+      titleDiv.hide();
+      playbutton.hide();
+      helpbutton.hide();
+      optionsbutton.hide();
+      optionAbtn.show();
+      optionBbtn.show();
+      optionCbtn.show();
+      optionDbtn.show();
+      optionEbtn.show();
+      feedbackDiv.show();
+      rulesDiv.show();
+      questionDiv.show();
+        hideAButton.show();
+        hideBButton.show();
+        hideCButton.show();
+        hideDButton.show();
+        hideEButton.show();
+      if(wrongCount < 6 && win == false)
+      {
+        if(frameCount % 60 == 0 && seconds > 0) 
+        { 
+          seconds --;
+        }
+        if(minutes > 0 && seconds == 0)
+        {
+          minutes = minutes - 1; 
+          seconds = 59;
+        }
+      }
+      fill(255);
+      textSize(32);
+      timer = text(minutes + ":" + seconds,100,100);
+      //hanger
+      fill(0);
+      strokeWeight(4);
+      hangar1 = line(300,100,300,800);
+      hangar2 = line(300,100,450,100);
+      hangar3 = line(450,100,450,200);
+      
+      quitbutton.show();
 
-    switch (questionCount){
-        case 0:
-            questionText = questionText1;
-            correctOption=correctOption1;
-            optionAText=optionAText1;
-            optionBText=optionBText1;
-            optionCText=optionCText1;
-            optionDText=optionDText1;
-            optionEText=optionEText1;
-            break;
-        case 1:
-            questionText = questionText2;
-            correctOption = correctOption2;
-            optionAText=optionAText2;
-            optionBText=optionBText2;
-            optionCText=optionCText2;
-            optionDText=optionDText2;
-            optionEText=optionEText2;
-            break;
-        case 2:
-            questionText = questionText3;
-            correctOption = correctOption3;
-            optionAText=optionAText3;
-            optionBText=optionBText3;
-            optionCText=optionCText3;
-            optionDText=optionDText3;
-            optionEText=optionEText3;
-            break;
-        case 3:
-            winorlose.html("YOU WIN!!!!!");
-            winorlose.style('color', 'green');
-            winorlose.style('font-size','200%');
+      switch (questionCount){
+          case 0:
+              questionText = questionText1;
+              correctOption=correctOption1;
+              optionAText=optionAText1;
+              optionBText=optionBText1;
+              optionCText=optionCText1;
+              optionDText=optionDText1;
+              optionEText=optionEText1;
+              break;
+          case 1:
+              questionText = questionText2;
+              correctOption = correctOption2;
+              optionAText=optionAText2;
+              optionBText=optionBText2;
+              optionCText=optionCText2;
+              optionDText=optionDText2;
+              optionEText=optionEText2;
+              break;
+          case 2:
+              questionText = questionText3;
+              correctOption = correctOption3;
+              optionAText=optionAText3;
+              optionBText=optionBText3;
+              optionCText=optionCText3;
+              optionDText=optionDText3;
+              optionEText=optionEText3;
+              break;
+          case 3:
+              questionText = questionText4;
+              correctOption = correctOption4;
+              optionAText=optionAText4;
+              optionBText=optionBText4;
+              optionCText=optionCText4;
+              optionDText=optionDText4;
+              optionEText=optionEText4;
+              break;
+          case 4:
+              questionText = questionText5;
+              correctOption = correctOption5;
+              optionAText=optionAText5;
+              optionBText=optionBText5;
+              optionCText=optionCText5;
+              optionDText=optionDText5;
+              optionEText=optionEText5;
+              break;
+          case 5:
+              quitprompt.show();
+              quitprompt.style('background-color', 'green');
+              quittext.html("You WIN! Please quit the game to restart.");
+              win = true;
+      }
+
+      //textSize(32);
+      //textFont('Georgia');
+      //text('Rules',100,0,100,100);
+      //fill(0,0,0);
+      //textFont('Arial');
+      //textSize(10);
+      //text(rulesText,textX,100,100,200);
+      //fill(0,0,0);
+      //text(cond1,textX,200,100,100);
+      //fill(0,0,0);
+      //text(cond2,textX,300,100,100);
+      //fill(0,0,0);
+      //text(cond3,textX,400,100,100);
+      //fill(0,0,0);
+      //textSize(32);
+      //textFont('Georgia');
+      //text('Question',textX,100,500,500);
+      //fill(0,0,0);    textFont('Arial');
+      //textSize(24);
+      //text(questionText);
+      //fill(0,0,0);
+
+      //shows current question/options on screen
+      questionPar.html(questionText);
+      optionApar.html(optionAText);
+      optionBpar.html(optionBText);
+      optionCpar.html(optionCText);
+      optionDpar.html(optionDText);
+      optionEpar.html(optionEText);
     }
 
-    //textSize(32);
-    //textFont('Georgia');
-    //text('Rules',100,0,100,100);
-    //fill(0,0,0);
-    //textFont('Arial');
-    //textSize(10);
-    //text(rulesText,textX,100,100,200);
-    //fill(0,0,0);
-    //text(cond1,textX,200,100,100);
-    //fill(0,0,0);
-    //text(cond2,textX,300,100,100);
-    //fill(0,0,0);
-    //text(cond3,textX,400,100,100);
-    //fill(0,0,0);
-    //textSize(32);
-    //textFont('Georgia');
-    //text('Question',textX,100,500,500);
-    //fill(0,0,0);    textFont('Arial');
-    //textSize(24);
-    //text(questionText);
-    //fill(0,0,0);
+}
 
-    //shows current question/options on screen
-    questionPar.html(questionText);
-    optionApar.html(optionAText);
-    optionBpar.html(optionBText);
-    optionCpar.html(optionCText);
-    optionDpar.html(optionDText);
-    optionEpar.html(optionEText);
-
+function gotSpeech() {
+    console.log(speechRec);
 }
 function wrongAnswer(){
     if(wrongCount === 0){
@@ -278,21 +472,26 @@ function wrongAnswer(){
     }
     if(wrongCount === 5){
         leg2 = line(450, 500, 350, 600);
-        winorlose.html("YOU LOSE!!!");
-        winorlose.style('color', 'red');
-        winorlose.style('font-size', '200%');
+        wrongCount += 1;
+        quitprompt.show();
+        quitprompt.style('background-color', 'red');
+        quittext.html("You lose. Please quit the game to restart.");
         return;
     }
+
 }
 function checkA(){
     answer = 'A';
     if(answer === correctOption){
         feedbackDiv.html("You are correct! WOW!");
+        feedbackDiv.style("color", "green");
+        resetPars();
         questionCount += 1;
     }
     else{
         wrongAnswer();
-        feedbackDiv.html("You are incorrect! Sorry!")
+        feedbackDiv.html("You are incorrect! Sorry!");
+        feedbackDiv.style("color", "red");
     }
 }
 
@@ -300,43 +499,113 @@ function checkB(){
     answer = "B";
     if(answer === correctOption){
         feedbackDiv.html("You are correct! WOW!");
+        feedbackDiv.style("color", "green");
+        resetPars();
         questionCount += 1;
     }
     else{
         wrongAnswer();
-        feedbackDiv.html("You are incorrect! Sorry!")
+        feedbackDiv.html("You are incorrect! Sorry!");
+        feedbackDiv.style("color", "red");
     }
 }
 function checkC(){
     answer = "C";
     if(answer === correctOption){
         feedbackDiv.html("You are correct! WOW!");
+        feedbackDiv.style("color", "green");
+        resetPars();
         questionCount += 1;
     }
     else{
         wrongAnswer();
-        feedbackDiv.html("You are incorrect! Sorry!")
+        feedbackDiv.html("You are incorrect! Sorry!");
+        feedbackDiv.style("color", "green");
+        feedbackDiv.style("color", "red");
     }
 }
 function checkD(){
     answer = "D";
     if(answer === correctOption){
         feedbackDiv.html("You are correct! WOW!");
+        feedbackDiv.style("color", "green");
+        resetPars();
         questionCount += 1;
     }
     else{
         wrongAnswer();
-        feedbackDiv.html("You are incorrect! Sorry!")
+        feedbackDiv.html("You are incorrect! Sorry!");
+        feedbackDiv.style("color", "red");
     }
 }
 function checkE(){
     answer = "E";
     if(answer === correctOption){
         feedbackDiv.html("You are correct! WOW!");
+        feedbackDiv.style("color", "green");
+        resetPars();
         questionCount += 1;
     }
     else{
         wrongAnswer();
-        feedbackDiv.html("You are incorrect! Sorry!")
+        feedbackDiv.html("You are incorrect! Sorry!");
+        feedbackDiv.style("color", "red");
     }
+
+}
+
+function hideA(){
+    optionApar.style('color','gray');
+}
+function hideB(){
+    optionBpar.style('color','gray');
+}
+function hideC(){
+    optionCpar.style('color','gray');
+}
+function hideD(){
+    optionDpar.style('color','gray');
+}
+function hideE(){
+    optionEpar.style('color','gray');
+}
+
+function resetPars(){
+    optionApar.style('color','black');
+    optionBpar.style('color','black');
+    optionCpar.style('color','black');
+    optionDpar.style('color','black');
+    optionEpar.style('color','black');
+}
+
+function play()
+{
+  menu = false;
+}
+
+function help()
+{
+  help1 = true;
+}
+
+function options()
+{
+  
+}
+
+function endhelp()
+{
+  help1 = false;
+}
+
+function quit()
+{
+  menu = true;
+  questionCount = 0;
+  wrongCount = 0;
+  //reset the feedback
+  feedbackDiv.html('You have not answered yet!');
+  feedbackDiv.style("color", "black");
+  minutes = 9;
+  seconds = 0;
 }
